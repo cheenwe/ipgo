@@ -4,7 +4,10 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net"
+	"net/http"
 	"strings"
 
 	"10sh.cn/ip/ip17mon"
@@ -27,39 +30,69 @@ type Res struct {
 	City     string
 }
 
+func IpToAddress(c *gin.Context) {
+
+	ip := c.Query("ip")
+	address := net.ParseIP(ip)
+	result := map[string]interface{}{}
+
+	ret := new(Res)
+	if address == nil {
+		result["msg"] = " IP 格式错误"
+		result["code"] = 0
+		result["data"] = ret
+	} else {
+		info := string(ip17mon.Find(ip))
+		res := strings.Split(info, "\t")
+		result["msg"] = "成功"
+		result["code"] = 1
+		ret.Ip = ip
+		ret.Country = res[0]
+		ret.Province = res[1]
+		ret.City = res[2]
+
+		if ret.Country == ret.Province {
+			ret.Province = ""
+			ret.City = ""
+		} else if ret.City == ret.Province {
+			ret.City = ""
+		}
+		result["data"] = ret
+	}
+	c.JSON(200, result)
+}
+func CheckShorter(c *gin.Context) {
+	// c.JSON(200, devices)
+
+	pth := fmt.Sprintf("%s", c.Request.URL)
+	fmt.Println(strings.Count(pth, "/")) //2
+	//截取
+	if strings.Count(pth, "/") == 1 {
+		c.String(http.StatusOK, pth[1:])
+	} else {
+		c.String(http.StatusNotFound, "not find")
+	}
+}
+
 func main() {
 	router := gin.Default()
+	gin.ForceConsoleColor()
 
-	router.GET("/ip", func(c *gin.Context) {
-		ip := c.Query("ip")
-		address := net.ParseIP(ip)
-		result := map[string]interface{}{}
+	router.POST("/ip", func(c *gin.Context) { IpToAddress(c) })
 
-		ret := new(Res)
-		if address == nil {
-			result["msg"] = " IP 格式错误"
-			result["code"] = 0
-			result["data"] = ret
-		} else {
-			info := string(ip17mon.Find(ip))
-			res := strings.Split(info, "\t")
-			result["msg"] = "成功"
-			result["code"] = 1
-			ret.Ip = ip
-			ret.Country = res[0]
-			ret.Province = res[1]
-			ret.City = res[2]
+	router.GET("/s/:code", func(c *gin.Context) {
+		log.Printf("C: %v", c)
+		log.Printf("code: %v", c.Param("code"))
 
-			if ret.Country == ret.Province {
-				ret.Province = ""
-				ret.City = ""
-			} else if ret.City == ret.Province {
-				ret.City = ""
-			}
-			result["data"] = ret
-		}
-		c.JSON(200, result)
+		fmt.Println(c.Param("code"))
+		fmt.Println(c)
+		fmt.Println(c)
+		fmt.Println(c.Query("code"))
+
+		c.Redirect(http.StatusMovedPermanently, "http://www.baidu.com")
 	})
+
+	router.NoRoute((func(c *gin.Context) { CheckShorter(c) }))
 
 	router.Static("/assets", "./assets")
 

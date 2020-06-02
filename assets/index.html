@@ -130,8 +130,8 @@
 
     <div class="navbar wrapper mb10 clearfix">
       <div class="mnav fl">
-        当前位置： <a href="//0.0.0.0:8080/">工具</a> &gt;
-        <a href="//0.0.0.0:8080/assets/">IP查询</a>
+        当前位置： <a href="//0.0.0.0:8081/">工具</a> &gt;
+        <a href="//0.0.0.0:8081/assets/">IP查询</a>
       </div>
     </div>
 
@@ -180,7 +180,7 @@
     xhr = new XMLHttpRequest();
     var ip = document.getElementById("address").value;
 
-    xhr.open('GET', '/ip?ip=' + ip, true); //第三个参数一定要设置为true，异步不阻塞，不会影响到后面JS的执行。
+    xhr.open('POST', '/ip?ip=' + ip, true); //第三个参数一定要设置为true，异步不阻塞，不会影响到后面JS的执行。
 
     xhr.send();
 
