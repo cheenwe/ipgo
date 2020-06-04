@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="IP 查询, IP 查地址, IP查区域" name="description" />
+    <meta content="短域名, 短域名工具, 短域名生成" name="description" />
     <meta content="chenwei,cxhyun@126.com" name="author" />
     <link rel="shortcut icon" href="favicon.ico" />
-    <title>IP查询-根据IP返回IP所属区域</title>
+    <title>短域名-短域名工具</title>
     <style>
         body {
             color: #333;
@@ -131,7 +131,7 @@
     <div class="navbar wrapper mb10 clearfix">
       <div class="mnav fl">
         当前位置： <a href="//0.0.0.0:8081/">工具</a> &gt;
-        <a href="//0.0.0.0:8081/assets/">IP查询</a> &gt;
+        <a href="//0.0.0.0:8081/assets/">IP查询</a>&gt;
         <a href="//0.0.0.0:8081/assets/sdn.html">短域名</a>
       </div>
     </div>
@@ -143,9 +143,9 @@
       <div class="publicSearch w622 auto">
           <div class="search-wrap clearfix pr">
             <div class="search-left w442 pr">
-              <input id="address" type="text" name="ip" url="true" value=""
-                class="search-cont w442 " placeholder="请输入IP" >
-              <a href="javascript:" title="清空" onclick="clear_ip()"  class="quickdelete"
+              <input id="address" type="text" name="url" url="true" value=""
+                class="search-cont w442 " placeholder="请输入域名" >
+                <a href="javascript:" title="清空" onclick="clear_ip()"  class="quickdelete"
                 style="display: inline;"></a>
             </div>
             <div class="search-right">
@@ -158,7 +158,7 @@
       <br>
     <ul>
         <li>
-            1.API接口地址: <a href="http://0.0.0.0:8081/ip?ip=223.5.5.5" target="_blank">http://0.0.0.0:8081/ip?ip=223.5.5.5</a>
+            1.API接口地址: POST:  <a href="http://0.0.0.0:8081/domain?url=https://3w.huanqiu.com/a/58ef16/3yVgxMtu22z?agt=8" target="_blank">http://0.0.0.0:8081/domain?url=xxx</a>
         </li>
     </ul>
     </div>
@@ -179,9 +179,9 @@
     var xhr = null; //先设置xhr为空，为了轮询时再次调用函数对xhr重用，引发错误
 
     xhr = new XMLHttpRequest();
-    var ip = document.getElementById("address").value;
+    var url = document.getElementById("address").value;
 
-    xhr.open('POST', '/ip?ip=' + ip, true); //第三个参数一定要设置为true，异步不阻塞，不会影响到后面JS的执行。
+    xhr.open('POST', '/domain?url=' + url, true); //第三个参数一定要设置为true，异步不阻塞，不会影响到后面JS的执行。
 
     xhr.send();
 

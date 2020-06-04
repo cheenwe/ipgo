@@ -4,12 +4,14 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"strings"
 
+	"10sh.cn/ip/db"
 	"10sh.cn/ip/ip17mon"
 	"github.com/gin-gonic/gin"
 )
@@ -61,14 +63,36 @@ func IpToAddress(c *gin.Context) {
 	}
 	c.JSON(200, result)
 }
-func CheckShorter(c *gin.Context) {
+
+func SaveUrl(conn *sql.DB, c *gin.Context) {
+	log.Printf("C: %v", c)
+	url := c.Query("url")
+	log.Printf("C: %s", url)
+	// conn, err := sqlite3.ConnectDB("db/dev.db")
+	// _ := sqlite3.InitTable(conn)
+
+	// db.CreateLinkTable(conn)
+	db.InsertLink(conn, url, "123")
+
+	log.Printf("ok")
+
+}
+
+func CheckShorter(conn *sql.DB, c *gin.Context) {
 	// c.JSON(200, devices)
 
 	pth := fmt.Sprintf("%s", c.Request.URL)
 	fmt.Println(strings.Count(pth, "/")) //2
 	//截取
 	if strings.Count(pth, "/") == 1 {
-		c.String(http.StatusOK, pth[1:])
+		code := pth[1:]
+		log.Printf(code)
+
+		url := db.QueryLink(conn, code)
+
+		// c.String(http.StatusOK, code)
+
+		c.Redirect(http.StatusMovedPermanently, url)
 	} else {
 		c.String(http.StatusNotFound, "not find")
 	}
@@ -78,6 +102,9 @@ func main() {
 	router := gin.Default()
 	gin.ForceConsoleColor()
 
+	conn := db.ConnectDB("sqlite3", "./db/data.db")
+
+	router.POST("/domain", func(c *gin.Context) { SaveUrl(conn, c) })
 	router.POST("/ip", func(c *gin.Context) { IpToAddress(c) })
 
 	router.GET("/s/:code", func(c *gin.Context) {
@@ -92,7 +119,7 @@ func main() {
 		c.Redirect(http.StatusMovedPermanently, "http://www.baidu.com")
 	})
 
-	router.NoRoute((func(c *gin.Context) { CheckShorter(c) }))
+	router.NoRoute((func(c *gin.Context) { CheckShorter(conn, c) }))
 
 	router.Static("/assets", "./assets")
 
