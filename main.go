@@ -9,10 +9,12 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 
 	"10sh.cn/ip/db"
-	"10sh.cn/ip/ip17mon"
+	"10sh.cn/ip/pkg/ip17mon"
+	"10sh.cn/ip/pkg/shortid"
 	"github.com/gin-gonic/gin"
 )
 
@@ -65,46 +67,73 @@ func IpToAddress(c *gin.Context) {
 }
 
 func SaveUrl(conn *sql.DB, c *gin.Context) {
-	log.Printf("C: %v", c)
 	url := c.Query("url")
+	code := shortid.MustGenerate()
 	log.Printf("C: %s", url)
-	// conn, err := sqlite3.ConnectDB("db/dev.db")
-	// _ := sqlite3.InitTable(conn)
+	log.Printf("save code: === [%s] %s", code, url)
 
-	// db.CreateLinkTable(conn)
-	db.InsertLink(conn, url, "123")
+	db.InsertLink(conn, url, code)
 
-	log.Printf("ok")
-
+	result := map[string]interface{}{}
+	result["msg"] = "成功"
+	result["code"] = 1
+	result["data"] = code
+	c.JSON(200, result)
 }
 
 func CheckShorter(conn *sql.DB, c *gin.Context) {
-	// c.JSON(200, devices)
-
 	pth := fmt.Sprintf("%s", c.Request.URL)
 	fmt.Println(strings.Count(pth, "/")) //2
 	//截取
 	if strings.Count(pth, "/") == 1 {
 		code := pth[1:]
-		log.Printf(code)
-
+		log.Printf("check code: === [%s]", code)
 		url := db.QueryLink(conn, code)
-
-		// c.String(http.StatusOK, code)
-
-		c.Redirect(http.StatusMovedPermanently, url)
+		if url == "0" {
+			c.String(http.StatusNotFound, "Not Find")
+		} else {
+			c.Redirect(http.StatusMovedPermanently, url)
+		}
 	} else {
-		c.String(http.StatusNotFound, "not find")
+		c.String(http.StatusNotFound, "Not Find")
 	}
+}
+
+// 1. 如果返回的错误为nil,说明文件或文件夹存在
+// 2. 如果返回的错误类型使用os.IsNotExist()判断为true,说明文件或文件夹不存在
+// 3. 如果返回的错误为其它类型,则不确定是否在存在
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
 func main() {
 	router := gin.Default()
 	gin.ForceConsoleColor()
+	// 判断db目录存在，不存在则新建
+	db_path := "./db/"
+	db_file := db_path + "data.db"
 
-	conn := db.ConnectDB("sqlite3", "./db/data.db")
+	db_path_exist, _ := PathExists(db_path)
 
-	router.POST("/domain", func(c *gin.Context) { SaveUrl(conn, c) })
+	if db_path_exist != true {
+		os.MkdirAll(db_path, os.ModePerm)
+	}
+	conn := db.ConnectDB("sqlite3", db_file)
+
+	fileInfo, _ := os.Stat(db_file)
+	db_size := fileInfo.Size()
+	log.Printf("db_size: %v", db_size)
+
+	db.CreateLinkTable(conn)
+
+	router.POST("/url", func(c *gin.Context) { SaveUrl(conn, c) })
 	router.POST("/ip", func(c *gin.Context) { IpToAddress(c) })
 
 	router.GET("/s/:code", func(c *gin.Context) {

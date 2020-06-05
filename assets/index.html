@@ -1,209 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="IP 查询, IP 查地址, IP查区域" name="description" />
-    <meta content="chenwei,cxhyun@126.com" name="author" />
+    <meta content="IP 查询, IP 查地址, IP 查地区, IP查区域" name="description" />
+    <meta content="chenwei,cheenwe,cxhyun@126.com" name="author" />
     <link rel="shortcut icon" href="favicon.ico" />
     <title>IP查询-根据IP返回IP所属区域</title>
-    <style>
-        body {
-            color: #333;
-            background-color: #e8e8e8;
-            line-height: 1.5;
-
-        }
-        .navbar {
-            background-color: #ffffff;
-            height: 40px;
-        }
-        .mb10 {
-            margin-bottom: 10px;
-        }
-        .wrapper {
-            width: 950px;
-            margin-left: auto;
-            margin-right: auto;
-            background: #fff;
-            height: auto;
-        }
-        .clearfix {
-            *zoom: 1;
-        }
-        .navbar .mnav, .navbar .Mnav-right, .navbar .Mnav-right02, .navbar .Mnav-right03
-        .main {
-        display: inline-block;
-        padding: 5px 20px;
-        line-height: 30px;
-        height: 30px;
-        color: #747d87;
-        }
-
-        .publicSearch {
-        padding: 30px 10px;
-        }
-        .w622 {
-        width: 622px;
-        }
-        .auto {
-        margin-left: auto;
-        margin-right: auto;
-        }
-        .search-left {
-        border: solid #c6cede;
-        height: 38px;
-        border-width: 1px 0px 1px 1px;
-        border-image: none;
-        background: #FFF;
-        vertical-align: top;
-        overflow: hidden;
-        position: relative;
-        }
-        .search-left, .search-right {
-        display: inline-block;
-        font: 16px arial;
-        margin: 0;
-        zoom: 1;
-        float: left;
-        }
-        .search-wrap .search-cont, .search-wrap .SMSearTxt {
-        color: #56688a;
-        }
-        .search-cont {
-        float: left;
-        height: 25px;
-        line-height: 25px;
-        margin: 6px 0px 0px 10px;
-        padding: 0px;
-        background: transparent none repeat scroll 0% 0%;
-        border: 0px none;
-        outline: 0px none;
-        }
-        .quickdelete {
-        background: url(/assets/quickdelete.png) 7px 12px #fff no-repeat;
-        width: 32px;
-        height: 32px;
-        position: absolute;
-        right: 0;
-        top: 0;
-        display: none;
-        }
-        .search-hint, .search-hint02 {
-        font-size: 14px;
-        color: #c0c1c4;
-        position: absolute;
-        left: 13px;
-        margin-top: 10px;
-        *margin-top: 12px;
-        letter-spacing: normal;
-        font-weight: normal;
-        z-index: 0;
-        top: 0;
-        }
-        .search-left, .search-right {
-        display: inline-block;
-        font: 16px arial;
-        margin: 0;
-        zoom: 1;
-        float: left;
-        }
-        .search-btn {
-        width: 90px;
-        background: #55a7e3;
-        color: #fff;
-        font-size: 14px;
-        height: 40px;
-        padding: 0px;
-        border: 0px none;
-        cursor: pointer;
-        }
-        .w442 {
-        width: 442px;
-        }
-        .center {
-        text-align:center;
-        }
-    </style>
+    <link href='/assets/common.css' rel='stylesheet' type='text/css'>
 </head>
+
 <body>
 
-    <div class="navbar wrapper mb10 clearfix">
-      <div class="mnav fl">
-        当前位置： <a href="//0.0.0.0:8081/">工具</a> &gt;
-        <a href="//0.0.0.0:8081/assets/">IP查询</a> &gt;
-        <a href="//0.0.0.0:8081/assets/sdn.html">短域名</a>
-      </div>
+    <div class="navbar wrapper mb10">
+        <div class="mnav">
+            当前位置： <a href="//0.0.0.0:8081/">工具</a> &gt;
+            <a href="//0.0.0.0:8081/assets/">IP查询</a> &gt;
+            <a href="//0.0.0.0:8081/assets/sdn.html">短域名</a>
+        </div>
     </div>
 
-    <div class="main wrapper mb10" id="leftinfo">
-      <div class="mnav fl">
+    <div class="main wrapper mb10">
+        <div class="mnav">
 
-      <!--PingSearch-begin-->
-      <div class="publicSearch w622 auto">
-          <div class="search-wrap clearfix pr">
-            <div class="search-left w442 pr">
-              <input id="address" type="text" name="ip" url="true" value=""
-                class="search-cont w442 " placeholder="请输入IP" >
-              <a href="javascript:" title="清空" onclick="clear_ip()"  class="quickdelete"
-                style="display: inline;"></a>
+            <!--PingSearch-begin-->
+            <div class="search auto">
+                <div class="search-wrap ">
+                    <div class="search-left w442 ">
+                        <input id="address" type="text" name="ip" url="true" value="116.116.116.116" class="input" placeholder="请输入IP">
+                        <a href="javascript:" title="清空" onclick="clear_ip()" class="quickdelete" style="display: inline;"></a>
+                    </div>
+                    <div class="search-right">
+                        <button class="search-btn" onclick="send_request()">查询</button>
+                    </div>
+                </div>
+                <br>
+                <div class="search-wrap" id="result">
+                    <button onclick="copy_result_text()">复制</button> &nbsp;
+                </div>
+
+                <div class="search-wrap">
+                    <ul>
+                        <li>
+                            1. 输入 ip 地址， 点击查询按钮即可通过 ip 查询其所属地区。
+                        </li>
+                        <li>
+                            2. API接口地址: <a href="http://0.0.0.0:8081/ip?ip=223.5.5.5" target="_blank">http://0.0.0.0:8081/ip?ip=223.5.5.5</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="search-right">
-                <button class="search-btn" onclick="send_request()">查询</button>
-          </div>
-      </div>
-      <br>
-      <div class="publicSearch w622 auto" id="result">
-      </div>
-      <br>
-    <ul>
-        <li>
-            1.API接口地址: <a href="http://0.0.0.0:8081/ip?ip=223.5.5.5" target="_blank">http://0.0.0.0:8081/ip?ip=223.5.5.5</a>
-        </li>
-    </ul>
-    </div>
 
-    <div class="center">
-        @cheenwe 2020 cxhyun@126.com
+            <div class="footer">
+                @cheenwe 2020 cxhyun@126.com
+            </div>
+        </div>
     </div>
-
 
 </body>
-<script>
-  var div = document.getElementById("result");
+<script src="/assets/index.js"></script>
 
-  var newp = document.createElement("p");
-
-  function send_request() {
-
-    var xhr = null; //先设置xhr为空，为了轮询时再次调用函数对xhr重用，引发错误
-
-    xhr = new XMLHttpRequest();
-    var ip = document.getElementById("address").value;
-
-    xhr.open('POST', '/ip?ip=' + ip, true); //第三个参数一定要设置为true，异步不阻塞，不会影响到后面JS的执行。
-
-    xhr.send();
-
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState == 4 && xhr.status == 200) {
-        var obj = JSON.parse(xhr.responseText)
-        console.log(obj)
-        console.log(obj)
-        if (obj['code']==1) {
-          console.log("处理完成!")
-          newp.innerHTML = obj['data']["Country"]+obj['data']["Province"]+obj['data']["City"] ;
-          div.appendChild(newp);
-        }else {
-            newp.innerHTML =obj["msg"];
-            div.appendChild(newp);
-        }
-      }
-    };
-  }
-function clear_ip() {
-    console.log("clear ok!")
-    document.getElementById("address").value =""
-}
-</script>
 </html>

@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 
 	"log"
 
@@ -42,7 +41,7 @@ func CreateLinkTable(db *sql.DB) error {
 		"code"	ASC
 	);
 	`
-	defer db.Close()
+	// defer db.Close()
 	_, err := db.Exec(sql)
 	return err
 }
@@ -61,7 +60,6 @@ func InsertLink(db *sql.DB, url string, code string) error {
 
 func QueryLink(db *sql.DB, code string) (url string) {
 	stmt, err := db.Prepare("select  url from links where code = ?  ORDER BY id DESC;")
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,99 +67,7 @@ func QueryLink(db *sql.DB, code string) (url string) {
 	err = stmt.QueryRow(code).Scan(&url)
 
 	if err != nil {
-		log.Fatal(err)
+		url = "0"
 	}
-
-	fmt.Println(url)
-
 	return url
 }
-
-// // Read
-// func (db *sql.DB) Read() {
-// 	rows, err := db.Query("SELECT * FROM users")
-// 	if err != nil {
-// 		fmt.Println(err.Error())
-// 		return
-// 	}
-// 	defer rows.Close()
-
-// 	for rows.Next() {
-// 		p := new(Link)
-// 		err := rows.Scan(&p.id, &p.url, &p.code)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 		}
-// 		fmt.Println(p.id, p.url, p.code)
-// 	}
-// }
-
-// // UPDATE
-// func (db *sql.DB) Update() {
-// 	stmt, err := db.Prepare("UPDATE users SET code = ? WHERE id = ?")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	result, err := stmt.Exec(10, 1)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	affectNum, err := result.RowsAffected()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	fmt.Println("update affect rows is ", affectNum)
-// }
-
-// // DELETE
-// func (db *sql.DB) Delete() {
-// 	stmt, err := db.Prepare("DELETE FROM users WHERE id = ?")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	result, err := stmt.Exec(1)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	affectNum, err := result.RowsAffected()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	fmt.Println("delete affect rows is ", affectNum)
-// }
-
-// // // Mysqlite3 - sqlite3 CRUD
-// // func main() {
-// // 	c, err := connectDB("sqlite3", "abc.db")
-// // 	if err != "" {
-// // 		print(err)
-// // 	}
-
-// // sql_table := `
-// // CREATE TABLE IF NOT EXISTS "userinfo" (
-// // 	"uid" INTEGER PRIMARY KEY AUTOINCREMENT,
-// // 	"userurl" VARCHAR(64) NULL,
-// // 	"departurl" VARCHAR(64) NULL,
-// // 	"created" TIMESTAMP default (datetime('now', 'localtime'))
-// // );
-// // CREATE TABLE IF NOT EXISTS "userdeatail" (
-// // 	"uid" INT(10) NULL,
-// // 	"intro" TEXT NULL,
-// // 	"profile" TEXT NULL,
-// // 	PRIMARY KEY (uid)
-// // );
-// // 	`
-// // 	c.Exec(sql_table)
-
-// // 	c.Create()
-// // 	fmt.Println("add action done!")
-
-// // 	c.Read()
-// // 	fmt.Println("get action done!")
-
-// // 	c.Update()
-// // 	fmt.Println("update action done!")
-
-// // 	c.Delete()
-// // 	fmt.Println("delete action done!")
-// // }
